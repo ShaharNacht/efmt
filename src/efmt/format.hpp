@@ -1,6 +1,6 @@
 #pragma once
 
-#include "efmt_formatter.hpp"
+#include "formatter.hpp"
 
 namespace efmt {
 

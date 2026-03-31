@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "efmt_format_specializer.hpp"
+#include "format_specializer.hpp"
 
 namespace efmt {
 

@@ -2,7 +2,7 @@
 
 // This library requires C++11
 
-#include "efmt_formatter.hpp"
-#include "efmt_format.hpp"
-#include "efmt_format_specializer.hpp"
-#include "efmt_receive.hpp"
+#include "formatter.hpp"
+#include "format.hpp"
+#include "format_specializer.hpp"
+#include "receive.hpp"
