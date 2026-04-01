@@ -37,9 +37,7 @@ public:
 template <typename R>
 class FormatSpecializer<R, std::nullptr_t> {
 public:
-    void write(Formatter<R> &f, const std::nullptr_t &value) {
-        (void) value;
-        
+    void write(Formatter<R> &f, const std::nullptr_t &) {
         f.write("<NULLPTR>");
     }
 };

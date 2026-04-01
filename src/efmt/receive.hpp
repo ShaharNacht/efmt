@@ -1,10 +1,13 @@
 #pragma once
 
 #include <cstddef>
+#include <utility>
+#include <memory>
 #include <iostream>
 
 namespace efmt {
 
+// A "concept" that represents a sink for formatted text.
 class Receive {
 public:
     // Implement this
@@ -42,6 +45,74 @@ public:
 
     void receive_multiple_chars(const char *chars, std::size_t count) {
         m_output.write(chars, count);
+    }
+};
+
+// Type-erased, dynamically dispatched receiver that can hold any receiver inside it.
+// Construct it using `Dyn::make()`, rather than the constructor.
+class Dyn: public Receive {
+private:
+    class Interface {
+    public:
+        Interface() = default;
+        virtual ~Interface() = default;
+
+        virtual void receive_char(char c) = 0;
+
+        virtual void receive_multiple_chars(const char *chars, std::size_t count) = 0;
+    };
+
+    template <typename R>
+    class Inner: public Interface {
+    public:
+        R receiver;
+
+        template <typename... Args>
+        Inner(Args &&... args) :
+            receiver(std::forward<Args>(args)...)
+        {}
+
+        virtual void receive_char(char c) override {
+            receiver.receive_char(c);
+        }
+
+        virtual void receive_multiple_chars(const char *chars, std::size_t count) override {
+            receiver.receive_multiple_chars(chars, count);
+        }
+    };
+
+    template <typename R>
+    class TypeSelector {};
+
+    std::unique_ptr<Interface> m_inner;
+
+    template <typename R, typename... Args>
+    Dyn(TypeSelector<R>, Args &&... args) :
+        m_inner(
+            std::unique_ptr<Inner<R>> {
+                new Inner<R> {
+                    std::forward<Args>(args)...
+                }
+            }
+        )
+    {}
+
+public:
+    Dyn(Dyn &&) = default;
+    Dyn &operator =(Dyn &&) = default;
+
+    // `R` is the concrete receiver type, `args` are the arguments to construct `R`.
+    template <typename R, typename... Args>
+    static Dyn make(Args &&... args) {
+        return Dyn { TypeSelector<R> {}, std::forward<Args>(args)... };
+    }
+
+    void receive_char(char c) {
+        m_inner->receive_char(c);
+    }
+
+    void receive_multiple_chars(const char *chars, std::size_t count) {
+        m_inner->receive_multiple_chars(chars, count);
     }
 };
 

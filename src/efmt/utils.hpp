@@ -8,7 +8,7 @@
 
 namespace efmt {
 
-// Print formatted arguments to `std::cout`. (No linebreak)
+// Print formatted arguments to `std::cout`. (No added linebreak at the end)
 template <typename... Args>
 void print(Args &&... args) {
     Formatter<Print> f;
@@ -22,7 +22,7 @@ void println(Args &&... args) {
     print(std::forward<Args>(args)..., '\n');
 }
 
-// Print formatted arguments to `std::cerr`. (No linebreak)
+// Print formatted arguments to `std::cerr`. (No added linebreak at the end)
 template <typename... Args>
 void eprint(Args &&... args) {
     Formatter<Print> f { std::cerr };

@@ -21,10 +21,14 @@ public:
 };
 
 int main() {
+    efmt::Formatter<efmt::Dyn> f { efmt::Dyn::make<efmt::Print>() };
+
     Person person { "Shmulik", 27 };
     
     // Prints: My favourite person is: Person { name: "Shmulik", age: 27 }
     efmt::println("My favourite person is: ", person);
+
+    f.writeln(Person("abc", 123), " --- ", Person("def", 456));
 
     return 0;
 }
