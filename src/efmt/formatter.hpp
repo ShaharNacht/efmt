@@ -30,6 +30,11 @@ public:
         write(std::forward<B>(second), std::forward<Rest>(rest)...);
     }
 
+    template <typename... Args>
+    void writeln(Args &&... args) {
+        write(std::forward<Args>(args)..., '\n');
+    }
+
     void write_char(char c) {
         m_receiver.receive_char(c);
     }
