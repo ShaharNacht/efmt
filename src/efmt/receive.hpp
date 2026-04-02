@@ -48,7 +48,9 @@ public:
     }
 };
 
-// Type-erased, dynamically dispatched receiver that can hold any receiver inside it.
+// Type-erased receiver adapter.  
+// Can hold any receiver inside it, and formatted text is forwarded to it through dynamic dispatch.
+// 
 // Construct it using `Dyn::make()`, rather than the constructor.
 class Dyn: public Receive {
 private:
