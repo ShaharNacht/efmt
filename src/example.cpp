@@ -30,21 +30,21 @@ public:
 
 class Dog: public Animal {
 public:
-    virtual void format(efmt::Formatter<efmt::Dyn> &f) const override {
+    virtual void format(efmt::Formatter<efmt::DynRef> &f) const override {
         f.write("Dog");
     }
 };
 
 class Cat: public Animal {
 public:
-    virtual void format(efmt::Formatter<efmt::Dyn> &f) const override {
+    virtual void format(efmt::Formatter<efmt::DynRef> &f) const override {
         f.write("Cat");
     }
 };
 
 int main() {
     efmt::Formatter<efmt::Print> f;
-    efmt::Formatter<efmt::Dyn> dyn = f.as_dyn_ref();
+    efmt::Formatter<efmt::DynRef> dyn = f.as_dyn_ref();
 
     std::vector<std::unique_ptr<Animal>> v;
     v.emplace_back(new Dog());

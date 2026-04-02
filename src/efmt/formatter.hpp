@@ -47,13 +47,9 @@ public:
     // Returns a type erased reference to `this`.
     // 
     // Lifetime consideration!  
-    // The returned `Formatter<Dyn>` contains a reference to `this`, and therefore `this` must outlive the returned `Formatter<Dyn>`!
-    Formatter<Dyn> as_dyn_ref() {
-        return Formatter<Dyn>(
-            efmt::Dyn::make<Ref<R>>(
-                m_receiver
-            )
-        );
+    // The returned `Formatter<DynRef>` contains a reference to `this`, and therefore `this` must outlive the returned `Formatter<DynRef>`!
+    Formatter<DynRef> as_dyn_ref() {
+        return Formatter<DynRef>(m_receiver);
     }
 };
 

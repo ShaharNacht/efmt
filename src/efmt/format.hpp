@@ -25,7 +25,7 @@ public:
     virtual ~DynFormat() = default;
 
     // Implement this
-    virtual void format(Formatter<Dyn> &f) const = 0;
+    virtual void format(Formatter<DynRef> &f) const = 0;
 };
 
 }

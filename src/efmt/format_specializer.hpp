@@ -14,8 +14,9 @@ namespace efmt {
 template <typename R>
 class Formatter;
 
-// A class you can specialize in order to effectively implement `Format` for types you don't own. (primitives, std collections, etc.)  
-// If you want to be able to format a class you do own, implement `Format` for it instead.
+// A class you can specialize in order to effectively implement `Format` for types you don't own.
+// (primitives, `std` collections, types from other libraries etc.)  
+// If you want to be able to format a class you do own, implement `Format` or `DynFormat` for it instead.
 template <typename R, typename T, typename Enable = void>
 class FormatSpecializer {
 public:
@@ -64,10 +65,10 @@ public:
     }
 };
 
-template <typename R>
-class FormatSpecializer<R, std::string> {
+template <typename R, typename Traits, typename Allocator>
+class FormatSpecializer<R, std::basic_string<char, Traits, Allocator>> {
 public:
-    void write(Formatter<R> &f, const std::string &value) {
+    void write(Formatter<R> &f, const std::basic_string<char, Traits, Allocator> &value) {
         f.write_multiple_chars(value.c_str(), value.size());
     }
 };

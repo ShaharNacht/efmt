@@ -48,96 +48,42 @@ public:
     }
 };
 
-// Receiver adapter that holds a reference to another receiver.  
-// Can hold a reference to any receiver inside it, and formatted text is forwarded to it through static dispatch.
-template <typename R>
-class Ref: public Receive {
+// Type-erased receiver adapter.  
+// Can hold a reference to any receiver inside it, and formatted text is forwarded to it through dynamic dispatch.
+class DynRef: public Receive {
 private:
-    R &m_inner;
+    template <typename R>
+    class Impl {
+    public:
+        static void receive_char(void *receiver, char c) {
+            static_cast<R *>(receiver)->receive_char(c);
+        };
+        
+        static void receive_multiple_chars(void *receiver, const char *chars, std::size_t count) {
+            static_cast<R *>(receiver)->receive_multiple_chars(chars, count);
+        };
+    };
+
+    void *m_inner;
+    void (*m_receive_char)(void *, char);
+    void (*m_receive_multiple_chars)(void *, const char *, std::size_t);
 
 public:
     // Lifetime consideration!  
-    // `Ref` stores a reference to a receiver, and therefore the receiver must outlive this instance of `Ref`!
-    Ref(R &receiver) :
-        m_inner(receiver)
+    // `DynRef` stores a reference to a receiver, and therefore the receiver must outlive this instance of `DynRef`!
+    template <typename R>
+    DynRef(R &receiver) :
+        m_inner(static_cast<void *>(&receiver)),
+        m_receive_char(Impl<R>::receive_char),
+        m_receive_multiple_chars(Impl<R>::receive_multiple_chars)
     {}
 
     void receive_char(char c) {
-        m_inner.receive_char(c);
+        m_receive_char(m_inner, c);
     }
 
     void receive_multiple_chars(const char *chars, std::size_t count) {
-        m_inner.receive_multiple_chars(chars, count);
-    }
-};
-
-// Type-erased receiver adapter.  
-// Can hold any receiver inside it, and formatted text is forwarded to it through dynamic dispatch.
-// 
-// Construct it using `Dyn::make()`, rather than the constructor.
-class Dyn: public Receive {
-private:
-    class Interface {
-    public:
-        Interface() = default;
-        virtual ~Interface() = default;
-
-        virtual void receive_char(char c) = 0;
-
-        virtual void receive_multiple_chars(const char *chars, std::size_t count) = 0;
-    };
-
-    template <typename R>
-    class Inner: public Interface {
-    public:
-        R receiver;
-
-        template <typename... Args>
-        Inner(Args &&... args) :
-            receiver(std::forward<Args>(args)...)
-        {}
-
-        virtual void receive_char(char c) override {
-            receiver.receive_char(c);
-        }
-
-        virtual void receive_multiple_chars(const char *chars, std::size_t count) override {
-            receiver.receive_multiple_chars(chars, count);
-        }
-    };
-
-    template <typename R>
-    class TypeSelector {};
-
-    std::unique_ptr<Interface> m_inner;
-
-    template <typename R, typename... Args>
-    Dyn(TypeSelector<R>, Args &&... args) :
-        m_inner(
-            std::unique_ptr<Inner<R>> (
-                new Inner<R> (
-                    std::forward<Args>(args)...
-                )
-            )
-        )
-    {}
-
-public:
-    Dyn(Dyn &&) = default;
-    Dyn &operator =(Dyn &&) = default;
-
-    // `R` is the concrete receiver type, `args` are the arguments to construct `R`.
-    template <typename R, typename... Args>
-    static Dyn make(Args &&... args) {
-        return Dyn { TypeSelector<R>(), std::forward<Args>(args)... };
-    }
-
-    void receive_char(char c) {
-        m_inner->receive_char(c);
-    }
-
-    void receive_multiple_chars(const char *chars, std::size_t count) {
-        m_inner->receive_multiple_chars(chars, count);
+        m_receive_multiple_chars(m_inner, chars, count);
     }
 };
 
