@@ -55,10 +55,12 @@ int main() {
     v.emplace_back(new Dog());
     v.emplace_back(new Cat());
     v.emplace_back(new Dog());
+    v.emplace_back();
 
-    efmt::println(*v[0]);
-    efmt::println(*v[1]);
-    efmt::println(*v[2]);
+    efmt::println(v[0]);
+    efmt::println(v[1]);
+    efmt::println(v[2]);
+    efmt::println(v[3]);
 
     return 0;
 }

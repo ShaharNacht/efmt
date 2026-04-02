@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <type_traits>
 #include <limits>
+#include <memory>
 #include <string>
 
 namespace efmt {
@@ -206,6 +207,18 @@ public:
         }
 
         f.write(']');
+    }
+};
+
+template <typename R, typename T, typename Deleter>
+class FormatSpecializer<R, std::unique_ptr<T, Deleter>> {
+public:
+    void write(Formatter<R> &f, const std::unique_ptr<T, Deleter> &value) {
+        if (value) {
+            f.write(*value);
+        } else {
+            f.write("<EMPTY UNIQUE_PTR>");
+        }
     }
 };
 
