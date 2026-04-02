@@ -27,6 +27,21 @@ public:
 
 // Provided specializations:
 
+class DynRef;
+class DynFormat;
+
+template<typename R, typename T>
+class FormatSpecializer<R, T, typename std::enable_if<
+    !std::is_same<R, DynRef>::value &&
+    std::is_base_of<DynFormat, T>::value
+>::type> {
+public:
+    void write(Formatter<R> &f, const T &value) {
+        Formatter<DynRef> dyn = f.as_dyn_ref();
+        value.format(dyn);
+    }
+};
+
 template <typename R>
 class FormatSpecializer<R, char> {
 public:

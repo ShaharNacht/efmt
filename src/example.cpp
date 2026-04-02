@@ -43,22 +43,22 @@ public:
 };
 
 int main() {
-    efmt::Formatter<efmt::Print> f;
-    efmt::Formatter<efmt::DynRef> dyn = f.as_dyn_ref();
+    efmt::println(Dog());
+    efmt::println(Cat());
+
+    Dog d {};
+    Animal &a = d;
+    efmt::println(d);
+    efmt::println(a);
 
     std::vector<std::unique_ptr<Animal>> v;
     v.emplace_back(new Dog());
     v.emplace_back(new Cat());
     v.emplace_back(new Dog());
 
-    dyn.writeln(*v[0]);
-    dyn.writeln(*v[1]);
-    dyn.writeln(*v[2]);
-
-    Person person { "Shmulik", 27 };
-    efmt::println("My favourite person is: ", person);
-
-    dyn.writeln(Person("abc", 123), " --- ", Person("def", 456));
+    efmt::println(*v[0]);
+    efmt::println(*v[1]);
+    efmt::println(*v[2]);
 
     return 0;
 }
