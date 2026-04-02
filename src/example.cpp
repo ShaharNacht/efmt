@@ -1,4 +1,6 @@
 #include <utility>
+#include <memory>
+#include <vector>
 #include <string>
 
 #include "efmt/efmt.hpp"
@@ -20,15 +22,43 @@ public:
     }
 };
 
+class Animal: public efmt::DynFormat {
+public:
+    Animal() = default;
+    virtual ~Animal() = default;
+};
+
+class Dog: public Animal {
+public:
+    virtual void format(efmt::Formatter<efmt::Dyn> &f) const override {
+        f.write("Dog");
+    }
+};
+
+class Cat: public Animal {
+public:
+    virtual void format(efmt::Formatter<efmt::Dyn> &f) const override {
+        f.write("Cat");
+    }
+};
+
 int main() {
-    efmt::Formatter<efmt::Dyn> f { efmt::Dyn::make<efmt::Print>() };
+    efmt::Formatter<efmt::Print> f;
+    efmt::Formatter<efmt::Dyn> dyn = f.as_dyn_ref();
+
+    std::vector<std::unique_ptr<Animal>> v;
+    v.emplace_back(new Dog());
+    v.emplace_back(new Cat());
+    v.emplace_back(new Dog());
+
+    dyn.writeln(*v[0]);
+    dyn.writeln(*v[1]);
+    dyn.writeln(*v[2]);
 
     Person person { "Shmulik", 27 };
-    
-    // Prints: My favourite person is: Person { name: "Shmulik", age: 27 }
     efmt::println("My favourite person is: ", person);
 
-    f.writeln(Person("abc", 123), " --- ", Person("def", 456));
+    dyn.writeln(Person("abc", 123), " --- ", Person("def", 456));
 
     return 0;
 }

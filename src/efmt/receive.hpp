@@ -48,6 +48,29 @@ public:
     }
 };
 
+// Receiver adapter that holds a reference to another receiver.  
+// Can hold a reference to any receiver inside it, and formatted text is forwarded to it through static dispatch.
+template <typename R>
+class Ref: public Receive {
+private:
+    R &m_inner;
+
+public:
+    // Lifetime consideration!  
+    // `Ref` stores a reference to a receiver, and therefore the receiver must outlive this instance of `Ref`!
+    Ref(R &receiver) :
+        m_inner(receiver)
+    {}
+
+    void receive_char(char c) {
+        m_inner.receive_char(c);
+    }
+
+    void receive_multiple_chars(const char *chars, std::size_t count) {
+        m_inner.receive_multiple_chars(chars, count);
+    }
+};
+
 // Type-erased receiver adapter.  
 // Can hold any receiver inside it, and formatted text is forwarded to it through dynamic dispatch.
 // 
@@ -91,11 +114,11 @@ private:
     template <typename R, typename... Args>
     Dyn(TypeSelector<R>, Args &&... args) :
         m_inner(
-            std::unique_ptr<Inner<R>> {
-                new Inner<R> {
+            std::unique_ptr<Inner<R>> (
+                new Inner<R> (
                     std::forward<Args>(args)...
-                }
-            }
+                )
+            )
         )
     {}
 
@@ -106,7 +129,7 @@ public:
     // `R` is the concrete receiver type, `args` are the arguments to construct `R`.
     template <typename R, typename... Args>
     static Dyn make(Args &&... args) {
-        return Dyn { TypeSelector<R> {}, std::forward<Args>(args)... };
+        return Dyn { TypeSelector<R>(), std::forward<Args>(args)... };
     }
 
     void receive_char(char c) {
