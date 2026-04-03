@@ -43,24 +43,42 @@ public:
 };
 
 int main() {
-    efmt::println(Dog());
-    efmt::println(Cat());
+    // efmt::println(Dog());
+    // efmt::println(Cat());
 
-    Dog d {};
-    Animal &a = d;
-    efmt::println(d);
-    efmt::println(a);
+    // Dog d {};
+    // Animal &a = d;
+    // efmt::println(d);
+    // efmt::println(a);
 
-    std::vector<std::unique_ptr<Animal>> v;
-    v.emplace_back(new Dog());
-    v.emplace_back(new Cat());
-    v.emplace_back(new Dog());
-    v.emplace_back();
+    // std::vector<std::unique_ptr<Animal>> v;
+    // v.emplace_back(new Dog());
+    // v.emplace_back(new Cat());
+    // v.emplace_back(new Dog());
+    // v.emplace_back();
 
-    efmt::println(v[0]);
-    efmt::println(v[1]);
-    efmt::println(v[2]);
-    efmt::println(v[3]);
+    // efmt::println(v[0]);
+    // efmt::println(v[1]);
+    // efmt::println(v[2]);
+    // efmt::println(v[3]);
+
+    std::weak_ptr<Animal> outer;
+    efmt::println("outer: ", outer);
+
+    {
+        std::shared_ptr<Animal> cat = std::make_shared<Cat>();
+        std::shared_ptr<Animal> cat2 = cat;
+        std::weak_ptr<Animal> cat3 = cat;
+
+        efmt::println("cat: ", cat);
+        efmt::println("cat2: ", cat2);
+        efmt::println("cat3: ", cat3);
+
+        outer = cat2;
+        efmt::println("outer: ", outer);
+    }
+
+    efmt::println("outer: ", outer);
 
     return 0;
 }

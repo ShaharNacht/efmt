@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <type_traits>
 #include <limits>
+#include <utility>
 #include <memory>
 #include <string>
 
@@ -218,6 +219,32 @@ public:
             f.write(*value);
         } else {
             f.write("<EMPTY UNIQUE_PTR>");
+        }
+    }
+};
+
+template <typename R, typename T>
+class FormatSpecializer<R, std::shared_ptr<T>> {
+public:
+    void write(Formatter<R> &f, const std::shared_ptr<T> &value) {
+        if (value.use_count() != 0) {
+            f.write(*value);
+        } else {
+            f.write("<EMPTY SHARED_PTR>");
+        }
+    }
+};
+
+template <typename R, typename T>
+class FormatSpecializer<R, std::weak_ptr<T>> {
+public:
+    void write(Formatter<R> &f, const std::weak_ptr<T> &value) {
+        std::shared_ptr<T> shared = value.lock();
+        
+        if (shared.use_count() != 0) {
+            f.write(std::move(shared));
+        } else {
+            f.write("<EXPIRED WEAK_PTR>");
         }
     }
 };

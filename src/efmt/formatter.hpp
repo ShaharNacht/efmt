@@ -25,6 +25,8 @@ public:
         spec.write(*this, value);
     }
 
+    void write() {}
+
     template <typename A, typename B, typename... Rest>
     void write(A &&first, B &&second, Rest &&... rest) {
         write(std::forward<A>(first));
@@ -44,7 +46,7 @@ public:
         m_receiver.receive_multiple_chars(chars, count);
     }
     
-    // Returns a type erased reference to `this`.
+    // Returns a type-erased reference to `this`.
     // 
     // Lifetime consideration!  
     // The returned `Formatter<DynRef>` contains a reference to `this`, and therefore `this` must outlive the returned `Formatter<DynRef>`!
