@@ -49,7 +49,13 @@ int main() {
     v.emplace_back(new Dog());
     v.emplace_back();
 
-    efmt::println(v);
+    // efmt::println(v);
+
+    efmt::Formatter<efmt::String> f;
+    f.write(v);
+
+    std::string *s = (std::string *) (&f);
+    efmt::println("\"", *s, "\"");
 
     return 0;
 }

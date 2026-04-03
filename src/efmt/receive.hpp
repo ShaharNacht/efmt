@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <utility>
 #include <memory>
+#include <string>
 #include <iostream>
 
 namespace efmt {
@@ -45,6 +46,22 @@ public:
 
     void receive_multiple_chars(const char *chars, std::size_t count) {
         m_output.write(chars, count);
+    }
+};
+
+class String: public Receive {
+private:
+    std::string m_output;
+
+public:
+    String() = default;
+
+    void receive_char(char c) {
+        m_output.push_back(c);
+    }
+
+    void receive_multiple_chars(const char *chars, std::size_t count) {
+        m_output.append(chars, count);
     }
 };
 
