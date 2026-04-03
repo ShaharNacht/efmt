@@ -9,6 +9,7 @@
 #include <limits>
 #include <utility>
 #include <memory>
+#include <vector>
 #include <string>
 
 namespace efmt {
@@ -246,6 +247,27 @@ public:
         } else {
             f.write("<EXPIRED WEAK_PTR>");
         }
+    }
+};
+
+template <typename R, typename T, typename Allocator>
+class FormatSpecializer<R, std::vector<T, Allocator>> {
+public:
+    void write(Formatter<R> &f, const std::vector<T, Allocator> &value) {
+        f.write('[');
+
+        bool first = true;
+        for (const T &item : value) {
+            if (first) {
+                first = false;
+            } else {
+                f.write(", ");
+            }
+
+            f.write(item);
+        }
+
+        f.write(']');
     }
 };
 
